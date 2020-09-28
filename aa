@@ -1,0 +1,47 @@
+
+function exportData() {
+	var columns = "发文日期,发文文号,制度名称,关键词,审批机构,制度版本,适用范围,适用区域,制度层级,制度状态,制度索引1,制度索引2,制度索引3,生效日期,废止日期,公司名称,主办部门,起草人,联系电话";
+	var fields = 
+"fldfbdata_dt,fldfwwh_s,fldzdmc_t,fldgjc_t,fldspjg_t,fldzdedition_s,fldsyfw_s,fldsyqy_s,fldzdsx_s,fldstatus_s,fldyjywly_s,fldejywly_s,fldsjywly_s,fldsxdata_dt,fldfzdata_dt,fldgsmc_s,fldzzbm_s,fldnigaoren_s,fldphone_s";
+	var pd=genPd({});
+	pd.fl = fields;
+	pd.sort = "fldgsmc_s:asc,fldfbdata_dt:desc";//排序
+    //不带内标题和摘要
+	formPostDownLoad(columns,fields,JSON.stringify(pd),"http://oasearch02.oanew.shenhua.cc:9080/index/exportData");
+	/*带内标题和摘要，需要多传2个参数
+formPostDownLoad(columns,fields,pd,"http://oasearch02.oanew.shenhua.cc:9080/index/exportData",'信息反馈情况统计表@@@信息反馈情况统计表','完成率:0%');*/
+}
+
+
+/*
+* title:标题。如果不传，默认为“数据导出”。“标题1@@@标题2”，表示文件名为标题1，内容第一行为标题2。“标题1”表示文件名为标题1，没有内标题。
+* summary：摘要。“摘要1@@@摘要2”，在表头上面输出多行字符串。多行的内容用@@@分隔。
+* */
+function formPostDownLoad(columns,fields,pd,url,title,summary) {
+	// 构造隐藏的form表单
+	var $form = $("<form id='download' class='hidden' method='post'></form>");
+	$form.attr("action",url);
+	$("body").append($form);
+	var $input1 = $("<input name='columns' type='text'></input>");
+	$input1.attr("value",columns);
+	$("#download").append($input1);
+	var $input2 = $("<input name='fields' type='text'></input>");
+	$input2.attr("value",fields);
+	$("#download").append($input2);
+	var $input3 = $("<input name='pd' type='text'></input>");
+	$input3.attr("value",pd);
+	$("#download").append($input3);
+if(title!=null && title!=""){
+        var $input4 = $("<input name='title' type='text'></input>");
+        $input4.attr("value",title);
+        $("#download").append($input4);
+    }
+	if(summary!=null && summary!=""){
+		var $input5 = $("<input name='summary' type='text'></input>");
+		$input5.attr("value",summary);
+		$("#download").append($input5);
+	}
+	// 提交表单
+	$form.submit();
+	$form.remove();
+}
